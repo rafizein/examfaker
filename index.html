@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Exambro Mode</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .top-bar {
+      background-color: #f3f3f3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 12px;
+      font-size: 14px;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .left, .right {
+      display: flex;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 4px;
+    }
+
+    .refresh-btn {
+      background-color: #222;
+    }
+
+    .close-btn {
+      background-color: #e53935;
+    }
+
+    .text {
+      color: #333;
+      margin: 0 4px;
+    }
+
+    .link-form {
+      padding: 10px;
+      background: #fafafa;
+      display: flex;
+      gap: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .link-form input {
+      flex: 1;
+      padding: 6px;
+      font-size: 14px;
+    }
+
+    .link-form button {
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    iframe {
+      width: 100%;
+      height: calc(100vh - 84px); /* bar atas (36px) + form input (48px) */
+      border: none;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="left">
+      <span id="baterai" class="text">BATERAI: --%</span>
+      <button class="icon-btn refresh-btn" onclick="location.reload()">↻</button>
+    </div>
+    <div class="right">
+      <button class="icon-btn close-btn" onclick="alert('Menutup halaman')">X</button>
+      <span id="jam" class="text">JAM: --:--:--</span>
+    </div>
+  </div>
+
+  <div class="link-form">
+    <input type="url" id="linkInput" placeholder="Masukkan link halaman atau Google Form di sini">
+    <button onclick="mulaiIframe()">Mulai</button>
+  </div>
+
+  <iframe id="frameView"></iframe>
+
+  <script>
+    function mulaiIframe() {
+      const link = document.getElementById('linkInput').value;
+      if (link.trim() !== "") {
+        const frame = document.getElementById('frameView');
+        frame.src = link;
+        frame.style.display = "block";
+      } else {
+        alert("Masukkan link terlebih dahulu.");
+      }
+    }
+
+    // Update jam setiap detik
+    setInterval(() => {
+      const now = new Date();
+      const jam = String(now.getHours()).padStart(2, '0');
+      const menit = String(now.getMinutes()).padStart(2, '0');
+      const detik = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('jam').textContent = `JAM: ${jam}:${menit}:${detik}`;
+    }, 1000);
+
+    // Ambil status baterai pengguna
+    if (navigator.getBattery) {
+      navigator.getBattery().then(function(battery) {
+        function updateBattery() {
+          const persen = Math.round(battery.level * 100);
+          document.getElementById('baterai').textContent = `BATERAI: ${persen}%`;
+        }
+        updateBattery();
+        battery.addEventListener('levelchange', updateBattery);
+      });
+    } else {
+      document.getElementById('baterai').textContent = 'BATERAI: Tidak didukung';
+    }
+  </script>
+
+</body>
+</html>
